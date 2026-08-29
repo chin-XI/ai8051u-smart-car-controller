@@ -1,6 +1,6 @@
 # AI8051U 智能车蓝牙控制台
 
-这是为 AI8051U 智能车和 JDY-31 蓝牙模块制作的移动端网页控制器。页面使用 Web Bluetooth 连接 JDY-31，可控制循迹、倒车、停车和速度档位，并实时显示四路电感传感器、总和、循迹误差及十字路口状态。
+这是为 AI8051U 智能车和 JDY-31 蓝牙模块制作的移动端网页控制器。页面默认使用 Web Serial 连接已经配对的 JDY-31 SPP 串口蓝牙，同时保留 FFE0 / FFE1 BLE 备用连接，可控制循迹、倒车、停车和速度档位，并实时显示四路电感传感器、总和、循迹误差及十字路口状态。
 
 ## 已适配的固件协议
 
@@ -35,13 +35,18 @@ SPEED=60
 ## 蓝牙参数
 
 - 模块：JDY-31
+- SPP 服务 UUID：`00001101-0000-1000-8000-00805F9B34FB`
 - BLE 服务：`0000FFE0-0000-1000-8000-00805F9B34FB`
 - 收发特征：`0000FFE1-0000-1000-8000-00805F9B34FB`
 - 单片机串口：9600 baud、8N1
 
+SPP 模式会调用系统已配对设备列表，并按标准串口服务筛选。首次授权后，浏览器支持 `getPorts()` 时可以通过“上次设备”重连。网页不能自行完成静默配对，也不能按 MAC 地址自动选择设备。
+
+BLE 模式按可编辑的设备名称前缀筛选，并通过浏览器匿名设备 ID 记住上次授权模块。
+
 ## 本地运行
 
-Web Bluetooth 要求安全来源。`localhost` 可以直接使用：
+Web Serial 和 Web Bluetooth 都要求安全来源。`localhost` 可以直接使用：
 
 ```powershell
 python -m http.server 8000
@@ -57,9 +62,9 @@ http://localhost:8000
 
 ## 手机使用
 
-- Android：推荐最新版 Chrome。
-- iPhone/iPad：Safari 不直接支持 Web Bluetooth，可使用 Bluefy 打开 HTTPS 页面。
-- JDY-31 不要提前在系统蓝牙设置中配对，应点击网页中的“选择 JDY-31”。
+- Android：SPP 模式需要支持蓝牙串口 Web Serial 的新版 Chrome。
+- 使用 SPP 前，先在手机系统蓝牙设置中配对 JDY-31，再从网页点“连接 SPP”。
+- iPhone/iPad：浏览器无法使用经典蓝牙 SPP；只能使用模块的 BLE 模式或原生应用。
 - 模块一次只能连接一个客户端，使用网页前请先断开蓝牙串口助手。
 
 ## 部署
@@ -70,7 +75,7 @@ http://localhost:8000
 
 - `index.html`：页面结构
 - `styles.css`：移动端响应式样式
-- `app.js`：Web Bluetooth、命令发送和数据解析
+- `app.js`：Web Serial / Web Bluetooth、命令发送和数据解析
 
 ## 安全提示
 

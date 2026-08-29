@@ -84,6 +84,13 @@ h2 { margin: 0; font-size: 1.17rem; }
 
 .button-row { align-items: stretch; }
 .button-row > * { min-width: 0; }
+.connection-settings { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; margin-bottom: 12px; }
+.device-filter {
+  width: 100%; min-height: 46px; padding: 0 13px; border: 1px solid var(--line);
+  border-radius: 12px; background: rgba(0,0,0,.24); color: var(--text); font: inherit;
+}
+.device-filter:focus { outline: 2px solid rgba(39, 151, 255, .42); outline-offset: 1px; }
+.device-filter:disabled { opacity: .62; }
 .button {
   min-height: 52px;
   padding: 0 20px;
