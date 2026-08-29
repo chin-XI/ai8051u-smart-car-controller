@@ -17,6 +17,7 @@ window.SmartCarSensorCharts = (() => {
   let connected = false;
   let initialized = false;
   let resizeTimer = null;
+  let lastCross = null;
 
   const fourSeries = [
     { key: "l1", color: "#42d7ee" }, { key: "l2", color: "#258cff" },
@@ -25,6 +26,10 @@ window.SmartCarSensorCharts = (() => {
   const sideSeries = [
     { key: "left", color: "#38dc82" }, { key: "right", color: "#b57cff" }
   ];
+  const crossEvents = {
+    enter: { color: "#38dc82", label: "进入" },
+    exit: { color: "#ff5365", label: "退出" }
+  };
 
   function maxPoints() { return Number(ui.historyLength.value) || 200; }
 
@@ -41,6 +46,31 @@ window.SmartCarSensorCharts = (() => {
     const context = canvas.getContext("2d");
     context.setTransform(ratio, 0, 0, ratio, 0, 0);
     return { context, width: rect.width, height: rect.height };
+  }
+
+  function drawCrossMarkers(ctx, plot, plotWidth) {
+    samples.forEach((sample, index) => {
+      const event = crossEvents[sample.crossEvent];
+      if (!event) return;
+      const x = plot.left + plotWidth * index / Math.max(1, samples.length - 1);
+
+      ctx.save();
+      ctx.strokeStyle = event.color;
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([6, 5]);
+      ctx.beginPath();
+      ctx.moveTo(x, plot.top);
+      ctx.lineTo(x, plot.bottom);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = event.color;
+      ctx.font = "700 10px ui-monospace, SFMono-Regular, Consolas, monospace";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "top";
+      ctx.fillText(event.label, Math.max(plot.left + 12, Math.min(plot.right - 12, x)),
+        plot.top + (sample.crossEvent === "enter" ? 2 : 15));
+      ctx.restore();
+    });
   }
 
   function drawChart(canvas, series, maximum) {
@@ -96,6 +126,7 @@ window.SmartCarSensorCharts = (() => {
       });
       ctx.stroke();
     });
+    drawCrossMarkers(ctx, plot, plotWidth);
   }
 
   function render() {
@@ -112,9 +143,17 @@ window.SmartCarSensorCharts = (() => {
 
   function push(data) {
     if (paused) return;
+    const cross = Number(data.cross) === 1 ? 1 : 0;
+    let crossEvent = null;
+    if (lastCross === null) {
+      if (cross === 1) crossEvent = "enter";
+    } else if (cross !== lastCross) {
+      crossEvent = cross === 1 ? "enter" : "exit";
+    }
+    lastCross = cross;
     const sample = {
       time: Date.now(), l1: data.l1, l2: data.l2, r1: data.r1, r2: data.r2,
-      left: data.l1 + data.l2, right: data.r1 + data.r2
+      left: data.l1 + data.l2, right: data.r1 + data.r2, cross, crossEvent
     };
     samples.push(sample);
     if (samples.length > maxPoints()) samples.splice(0, samples.length - maxPoints());
@@ -126,6 +165,7 @@ window.SmartCarSensorCharts = (() => {
 
   function clear() {
     samples.length = 0;
+    lastCross = null;
     ui.sampleCount.textContent = "0";
     [ui.l1, ui.l2, ui.r1, ui.r2, ui.left, ui.right].forEach((element) => { element.textContent = "--"; });
     render();
@@ -141,10 +181,11 @@ window.SmartCarSensorCharts = (() => {
 
   function exportCsv() {
     if (!samples.length) return;
-    const rows = ["time_ms,L1,L2,R1,R2,left_sum,right_sum"];
+    const rows = ["time_ms,L1,L2,R1,R2,left_sum,right_sum,CROSS,cross_event"];
     const start = samples[0].time;
     samples.forEach((sample) => rows.push([
-      sample.time - start, sample.l1, sample.l2, sample.r1, sample.r2, sample.left, sample.right
+      sample.time - start, sample.l1, sample.l2, sample.r1, sample.r2, sample.left, sample.right,
+      sample.cross, sample.crossEvent || ""
     ].join(",")));
     const blob = new Blob([`\uFEFF${rows.join("\r\n")}`], { type: "text/csv;charset=utf-8" });
     const link = document.createElement("a");
@@ -157,6 +198,7 @@ window.SmartCarSensorCharts = (() => {
   function setConnected(value) {
     connected = value;
     if (!value) {
+      lastCross = null;
       ui.streamState.textContent = paused ? "已暂停" : "等待数据";
       ui.streamState.classList.remove("live");
     } else if (!paused) {
