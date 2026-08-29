@@ -99,8 +99,8 @@ window.SmartCarSensorCharts = (() => {
   }
 
   function render() {
-    drawChart(ui.sensorCanvas, fourSeries, 4095);
-    drawChart(ui.sideCanvas, sideSeries, 8190);
+    drawChart(ui.sensorCanvas, fourSeries, 4000);
+    drawChart(ui.sideCanvas, sideSeries, 7000);
   }
 
   function updateLatest(sample) {
