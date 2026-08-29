@@ -51,6 +51,7 @@ function setConnected(connected) {
   ui.deviceNameFilter.disabled = connected;
   document.querySelectorAll(".control").forEach((button) => { button.disabled = !connected; });
   updateConnectionControls();
+  window.SmartCarTuning?.setConnected(connected);
 }
 
 function selectedConnectionType() {
@@ -311,8 +312,9 @@ async function sendCommand(command) {
     } else {
       throw new Error("当前连接不支持写入");
     }
-    addLog(command, "tx");
-    setMessage(`命令 ${command} 已发送`);
+    const commandLabel = command.trim();
+    addLog(commandLabel, "tx");
+    setMessage(`命令 ${commandLabel} 已发送`);
     return true;
   } catch (error) {
     setMessage(`发送失败：${error.message}`, true);
@@ -335,6 +337,11 @@ function processLine(line) {
   packetCount += 1;
   ui.packetCount.textContent = String(packetCount);
   ui.lastReceive.textContent = new Date().toLocaleTimeString([], { hour12: false });
+
+  if (window.SmartCarTuning?.processLine(line)) {
+    addLog(line, /^ERR\b/i.test(line) ? "error" : "rx");
+    return;
+  }
 
   const l1 = numberFrom(line, "L1");
   const l2 = numberFrom(line, "L2");
@@ -439,6 +446,7 @@ async function loadGrantedDevices() {
 }
 
 ui.deviceNameFilter.value = localStorage.getItem(BLE_PREFIX_KEY) ?? "JDY";
+window.SmartCarTuning?.init({ sendCommand, setMessage, onSpeed: (value) => setSpeed(value >= 100 ? "0" : String(Math.round(value / 10))) });
 setConnected(false);
 loadGrantedDevices();
 setDriveState("S");
