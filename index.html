@@ -96,7 +96,6 @@
         <button class="gear control" data-command="9" disabled><span>9</span><small>90%</small></button>
         <button class="gear full control" data-command="0" disabled><span>0</span><small>满速 100%</small></button>
       </div>
-      <p class="hint">十字路口由单片机自动临时降低一档，离开后恢复。</p>
     </section>
 
     <section class="card telemetry-card">
@@ -224,6 +223,7 @@
           <label class="parameter-field"><span><strong>P 分母</strong><small>KP_DIV · 1～1000</small></span><input class="param-input" data-param="KP_DIV" type="number" min="1" max="1000" value="130" disabled></label>
           <label class="parameter-field"><span><strong>D 分母</strong><small>KD_DIV · 1～1000</small></span><input class="param-input" data-param="KD_DIV" type="number" min="1" max="1000" value="120" disabled></label>
           <label class="parameter-field"><span><strong>D 最大修正</strong><small>D_MAX · 0～100%</small></span><input class="param-input" data-param="D_MAX" type="number" min="0" max="100" value="15" disabled></label>
+          <label class="parameter-field"><span><strong>D 滤波强度</strong><small>D_FILTER · 1不滤波 / 8最平滑</small></span><input class="param-input" data-param="D_FILTER" type="number" min="1" max="8" value="4" disabled></label>
           <label class="parameter-field"><span><strong>控制周期</strong><small>PID_MS · 5～100 ms</small></span><input class="param-input" data-param="PID_MS" type="number" min="5" max="100" value="20" disabled></label>
         </div>
       </section>
