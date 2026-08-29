@@ -243,12 +243,12 @@
       </section>
 
       <section class="card parameter-card">
-        <div class="parameter-heading"><div><p class="kicker">十字路口</p><h2>识别与控制</h2></div><small>保持现有判断逻辑</small></div>
+        <div class="parameter-heading"><div><p class="kicker">十字路口</p><h2>识别与控制</h2></div><small>左右平衡 + 四路全高</small></div>
         <div class="parameter-grid">
           <label class="parameter-field"><span><strong>检测开关</strong><small>CROSS_EN · 0关 / 1开</small></span><input class="param-input" data-param="CROSS_EN" type="number" min="0" max="1" value="1" disabled></label>
           <label class="parameter-field"><span><strong>左右侧阈值</strong><small>CROSS_SIDE_MIN · 0～4095</small></span><input class="param-input" data-param="CROSS_SIDE_MIN" type="number" min="0" max="4095" value="350" disabled></label>
           <label class="parameter-field"><span><strong>四路全高阈值</strong><small>CROSS_ALL_MIN · L1/L2/R1/R2</small></span><input class="param-input" data-param="CROSS_ALL_MIN" type="number" min="0" max="4095" value="1200" disabled></label>
-          <label class="parameter-field"><span><strong>四路总和阈值</strong><small>CROSS_SUM_MIN · 0～16380</small></span><input class="param-input" data-param="CROSS_SUM_MIN" type="number" min="0" max="16380" value="8000" disabled></label>
+          <label class="parameter-field"><span><strong>左右平衡比例</strong><small>CROSS_BALANCE · 弱侧/强侧 10%～100%</small></span><input class="param-input" data-param="CROSS_BALANCE" type="number" min="10" max="100" value="50" disabled></label>
           <label class="parameter-field"><span><strong>十字 P 分母</strong><small>CROSS_KP_DIV · 1～2000</small></span><input class="param-input" data-param="CROSS_KP_DIV" type="number" min="1" max="2000" value="300" disabled></label>
           <label class="parameter-field"><span><strong>连续确认次数</strong><small>CROSS_CONFIRM · 1～20</small></span><input class="param-input" data-param="CROSS_CONFIRM" type="number" min="1" max="20" value="2" disabled></label>
           <label class="parameter-field"><span><strong>通过保持时间</strong><small>CROSS_HOLD_MS · 0～2000 ms</small></span><input class="param-input" data-param="CROSS_HOLD_MS" type="number" min="0" max="2000" value="20" disabled></label>
