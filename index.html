@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#07111f">
+  <meta name="description" content="AI8051U 智能车 JDY-31 蓝牙控制台">
+  <title>AI8051U 智能车控制台</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">AI8051U · JDY-31</p>
+        <h1>智能车控制台</h1>
+        <p class="subtitle">循迹控制与四路电感传感器监视</p>
+      </div>
+      <div class="connection-pill" id="connectionPill">
+        <span class="status-dot"></span>
+        <span id="connectionText">未连接</span>
+      </div>
+    </header>
+
+    <section class="card connection-card">
+      <div class="section-title">
+        <div>
+          <p class="kicker">BLE UART</p>
+          <h2>蓝牙连接</h2>
+        </div>
+        <code>FFE0 / FFE1</code>
+      </div>
+      <div class="button-row">
+        <button class="button primary" id="connectButton" type="button">选择 JDY-31</button>
+        <button class="button ghost" id="disconnectButton" type="button" disabled>断开</button>
+      </div>
+      <div class="device-row">
+        <span>设备</span>
+        <strong id="deviceName">--</strong>
+      </div>
+      <p class="message" id="message" aria-live="polite">请使用 Chrome、Edge 或 iPhone Bluefy 打开</p>
+    </section>
+
+    <section class="card">
+      <div class="section-title compact">
+        <h2>车辆控制</h2>
+        <span class="mode-badge stopped" id="driveState">已停车</span>
+      </div>
+      <div class="drive-grid">
+        <button class="drive-button forward control" data-command="F" type="button" disabled>
+          <span class="drive-icon">▶</span><strong>开始循迹</strong><small>发送 F</small>
+        </button>
+        <button class="drive-button stop control" data-command="S" type="button" disabled>
+          <span class="drive-icon">■</span><strong>立即停车</strong><small>发送 S</small>
+        </button>
+        <button class="drive-button reverse control" data-command="B" type="button" disabled>
+          <span class="drive-icon">◀</span><strong>倒车</strong><small>发送 B</small>
+        </button>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-title compact">
+        <div>
+          <p class="kicker">PWM 档位</p>
+          <h2>速度设置</h2>
+        </div>
+        <strong class="speed-value" id="speedValue">60%</strong>
+      </div>
+      <div class="gear-grid" id="gearGrid" aria-label="速度档位">
+        <button class="gear control" data-command="1" disabled><span>1</span><small>10%</small></button>
+        <button class="gear control" data-command="2" disabled><span>2</span><small>20%</small></button>
+        <button class="gear control" data-command="3" disabled><span>3</span><small>30%</small></button>
+        <button class="gear control" data-command="4" disabled><span>4</span><small>40%</small></button>
+        <button class="gear control" data-command="5" disabled><span>5</span><small>50%</small></button>
+        <button class="gear control selected" data-command="6" disabled><span>6</span><small>60%</small></button>
+        <button class="gear control" data-command="7" disabled><span>7</span><small>70%</small></button>
+        <button class="gear control" data-command="8" disabled><span>8</span><small>80%</small></button>
+        <button class="gear control" data-command="9" disabled><span>9</span><small>90%</small></button>
+        <button class="gear full control" data-command="0" disabled><span>0</span><small>满速 100%</small></button>
+      </div>
+      <p class="hint">十字路口由单片机自动临时降低一档，离开后恢复。</p>
+    </section>
+
+    <section class="card telemetry-card">
+      <div class="section-title compact">
+        <div>
+          <p class="kicker">ADC 0–4095</p>
+          <h2>电感传感器</h2>
+        </div>
+        <span class="stream-state" id="streamState">等待数据</span>
+      </div>
+
+      <div class="sensor-grid">
+        <article class="sensor-tile">
+          <div><span>L1</span><strong id="l1Value">--</strong></div>
+          <div class="bar"><i id="l1Bar"></i></div>
+        </article>
+        <article class="sensor-tile">
+          <div><span>L2</span><strong id="l2Value">--</strong></div>
+          <div class="bar"><i id="l2Bar"></i></div>
+        </article>
+        <article class="sensor-tile">
+          <div><span>R1</span><strong id="r1Value">--</strong></div>
+          <div class="bar"><i id="r1Bar"></i></div>
+        </article>
+        <article class="sensor-tile">
+          <div><span>R2</span><strong id="r2Value">--</strong></div>
+          <div class="bar"><i id="r2Bar"></i></div>
+        </article>
+      </div>
+
+      <div class="metrics-grid">
+        <article class="metric">
+          <span>四路总和 SUM</span>
+          <strong id="sumValue">--</strong>
+        </article>
+        <article class="metric error-metric">
+          <span>循迹误差 ERROR</span>
+          <strong id="errorValue">--</strong>
+          <div class="error-track"><i id="errorNeedle"></i></div>
+          <small><b>左偏</b><b>居中</b><b>右偏</b></small>
+        </article>
+        <article class="metric cross normal" id="crossCard">
+          <span>十字检测</span>
+          <strong id="crossValue">CROSS=0</strong>
+          <small id="crossText">普通路段</small>
+        </article>
+      </div>
+    </section>
+
+    <section class="card log-card">
+      <div class="section-title compact">
+        <div>
+          <p class="kicker">UART</p>
+          <h2>通信日志</h2>
+        </div>
+        <button class="clear-button" id="clearLogButton" type="button">清空</button>
+      </div>
+      <div class="log" id="logWindow" role="log" aria-live="polite">
+        <p class="muted">等待蓝牙通信…</p>
+      </div>
+      <div class="log-footer">
+        <span>数据包 <b id="packetCount">0</b></span>
+        <span>最近接收 <b id="lastReceive">--</b></span>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
