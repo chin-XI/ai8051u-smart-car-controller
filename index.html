@@ -8,6 +8,7 @@
   <title>AI8051U 智能车控制台</title>
   <link rel="stylesheet" href="styles.css?v=20260829-spp">
   <link rel="stylesheet" href="tuning.css?v=20260829-runtime">
+  <link rel="stylesheet" href="sensor-charts.css?v=20260829-waveform">
 </head>
 <body>
   <main class="shell">
@@ -52,6 +53,7 @@
 
     <nav class="module-tabs" aria-label="功能模块">
       <button class="module-tab active" data-module="control" type="button">车辆控制</button>
+      <button class="module-tab" data-module="sensors" type="button">传感器调试</button>
       <button class="module-tab" data-module="tuning" type="button">参数调整</button>
     </nav>
 
@@ -145,6 +147,55 @@
     </section>
     </div>
 
+    <section class="app-module" id="sensorModule" hidden>
+      <section class="card sensor-debug-overview">
+        <div class="section-title compact">
+          <div>
+            <p class="kicker">实时采样</p>
+            <h2>传感器波形调试</h2>
+          </div>
+          <span class="stream-state" id="chartStreamState">等待数据</span>
+        </div>
+        <div class="chart-toolbar">
+          <label>显示点数
+            <select id="chartHistoryLength">
+              <option value="100">100</option>
+              <option value="200" selected>200</option>
+              <option value="400">400</option>
+            </select>
+          </label>
+          <button class="button ghost chart-action" id="pauseChartsButton" type="button">暂停波形</button>
+          <button class="button ghost chart-action" id="clearChartsButton" type="button">清空数据</button>
+          <button class="button ghost chart-action" id="exportChartsButton" type="button">导出 CSV</button>
+        </div>
+        <p class="chart-summary">已记录 <strong id="chartSampleCount">0</strong> 个采样点；图表暂停只影响网页记录，不影响单片机运行。</p>
+      </section>
+
+      <section class="card waveform-card">
+        <div class="waveform-heading">
+          <div><p class="kicker">ADC 0–4095</p><h2>四路传感器</h2></div>
+          <div class="waveform-legend" aria-label="四路传感器图例">
+            <span style="--series:#42d7ee">L1 <strong id="chartL1Value">--</strong></span>
+            <span style="--series:#258cff">L2 <strong id="chartL2Value">--</strong></span>
+            <span style="--series:#ffbd4a">R1 <strong id="chartR1Value">--</strong></span>
+            <span style="--series:#ff5365">R2 <strong id="chartR2Value">--</strong></span>
+          </div>
+        </div>
+        <div class="canvas-wrap"><canvas id="sensorWaveform" aria-label="L1、L2、R1、R2实时波形图"></canvas></div>
+      </section>
+
+      <section class="card waveform-card">
+        <div class="waveform-heading">
+          <div><p class="kicker">ADC 0–8190</p><h2>左右传感器总和</h2></div>
+          <div class="waveform-legend" aria-label="左右总和图例">
+            <span style="--series:#38dc82">左侧 L1+L2 <strong id="chartLeftValue">--</strong></span>
+            <span style="--series:#b57cff">右侧 R1+R2 <strong id="chartRightValue">--</strong></span>
+          </div>
+        </div>
+        <div class="canvas-wrap"><canvas id="sideSumWaveform" aria-label="左右传感器总和实时波形图"></canvas></div>
+      </section>
+    </section>
+
     <section class="app-module" id="tuningModule" hidden>
       <section class="card tuning-overview">
         <div class="section-title compact">
@@ -229,7 +280,8 @@
     </section>
   </main>
 
-  <script src="tuning.js?v=20260829-runtime"></script>
-  <script src="app.js?v=20260829-runtime"></script>
+  <script src="sensor-charts.js?v=20260829-waveform"></script>
+  <script src="tuning.js?v=20260829-waveform"></script>
+  <script src="app.js?v=20260829-waveform"></script>
 </body>
 </html>

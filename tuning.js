@@ -8,7 +8,7 @@ window.SmartCarTuning = (() => {
   );
   const ui = {
     tabs: [...document.querySelectorAll(".module-tab")],
-    controlModule: byId("controlModule"), tuningModule: byId("tuningModule"),
+    controlModule: byId("controlModule"), sensorModule: byId("sensorModule"), tuningModule: byId("tuningModule"),
     modeButton: byId("tuningModeButton"), modeStatus: byId("tuningModeStatus"),
     readButton: byId("readParamsButton"), applyButton: byId("applyParamsButton"),
     defaultsButton: byId("restoreDefaultsButton"), message: byId("tuningMessage"),
@@ -81,15 +81,17 @@ window.SmartCarTuning = (() => {
   }
 
   function showModule(name) {
-    if (name === "control" && modeActive) {
+    if (name !== "tuning" && modeActive) {
       api?.setMessage("请先退出参数调整模式", true);
       ui.message.textContent = "调参模式仍在运行，请先退出";
       return false;
     }
     ui.controlModule.hidden = name !== "control";
+    ui.sensorModule.hidden = name !== "sensors";
     ui.tuningModule.hidden = name !== "tuning";
     ui.tabs.forEach((button) => button.classList.toggle("active", button.dataset.module === name));
     history.replaceState(null, "", `#${name}`);
+    if (name === "sensors") requestAnimationFrame(() => window.SmartCarSensorCharts?.render());
     return true;
   }
 
@@ -277,7 +279,8 @@ window.SmartCarTuning = (() => {
     ui.defaultsButton.addEventListener("click", restoreDefaults);
     inputs.forEach((input) => input.addEventListener("input", updateDirtyCount));
     setInputAvailability();
-    showModule(location.hash === "#tuning" ? "tuning" : "control");
+    const initialModule = ["#control", "#sensors", "#tuning"].includes(location.hash) ? location.hash.slice(1) : "control";
+    showModule(initialModule);
   }
 
   return { init, processLine, setConnected };

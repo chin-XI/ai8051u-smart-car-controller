@@ -52,6 +52,7 @@ function setConnected(connected) {
   document.querySelectorAll(".control").forEach((button) => { button.disabled = !connected; });
   updateConnectionControls();
   window.SmartCarTuning?.setConnected(connected);
+  window.SmartCarSensorCharts?.setConnected(connected);
 }
 
 function selectedConnectionType() {
@@ -354,6 +355,7 @@ function processLine(line) {
 
   if (telemetry) {
     updateTelemetry({ l1, l2, r1, r2, sum, error, cross });
+    window.SmartCarSensorCharts?.push({ l1, l2, r1, r2 });
     const now = Date.now();
     if (now - lastTelemetryLog >= 250) {
       addLog(line);
@@ -446,6 +448,7 @@ async function loadGrantedDevices() {
 }
 
 ui.deviceNameFilter.value = localStorage.getItem(BLE_PREFIX_KEY) ?? "JDY";
+window.SmartCarSensorCharts?.init();
 window.SmartCarTuning?.init({ sendCommand, setMessage, onSpeed: (value) => setSpeed(value >= 100 ? "0" : String(Math.round(value / 10))) });
 setConnected(false);
 loadGrantedDevices();
