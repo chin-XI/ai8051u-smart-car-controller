@@ -355,7 +355,7 @@ function processLine(line) {
 
   if (telemetry) {
     updateTelemetry({ l1, l2, r1, r2, sum, error, cross });
-    window.SmartCarSensorCharts?.push({ l1, l2, r1, r2 });
+    window.SmartCarSensorCharts?.push({ l1, l2, r1, r2, cross });
     const now = Date.now();
     if (now - lastTelemetryLog >= 250) {
       addLog(line);

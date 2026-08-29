@@ -8,7 +8,7 @@
   <title>AI8051U 智能车控制台</title>
   <link rel="stylesheet" href="styles.css?v=20260829-spp">
   <link rel="stylesheet" href="tuning.css?v=20260829-runtime">
-  <link rel="stylesheet" href="sensor-charts.css?v=20260829-waveform">
+  <link rel="stylesheet" href="sensor-charts.css?v=20260830-crossmarkers">
 </head>
 <body>
   <main class="shell">
@@ -168,6 +168,10 @@
           <button class="button ghost chart-action" id="exportChartsButton" type="button">导出 CSV</button>
         </div>
         <p class="chart-summary">已记录 <strong id="chartSampleCount">0</strong> 个采样点；图表暂停只影响网页记录，不影响单片机运行。</p>
+        <div class="cross-marker-legend" aria-label="十字路口状态标记图例">
+          <span class="enter">绿色虚线：进入十字</span>
+          <span class="exit">红色虚线：退出十字</span>
+        </div>
       </section>
 
       <section class="card waveform-card">
@@ -280,8 +284,8 @@
     </section>
   </main>
 
-  <script src="sensor-charts.js?v=20260829-baud57600"></script>
+  <script src="sensor-charts.js?v=20260830-crossmarkers"></script>
   <script src="tuning.js?v=20260829-baud57600"></script>
-  <script src="app.js?v=20260829-baud57600"></script>
+  <script src="app.js?v=20260830-crossmarkers"></script>
 </body>
 </html>
