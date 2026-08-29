@@ -2,6 +2,8 @@
 
 const SERVICE_UUID = "0000ffe0-0000-1000-8000-00805f9b34fb";
 const CHARACTERISTIC_UUID = "0000ffe1-0000-1000-8000-00805f9b34fb";
+const TARGET_DEVICE_NAME = "JDY-31-SPP";
+const REMEMBERED_DEVICE_KEY = "smart-car-jdy31-device-id";
 
 const byId = (id) => document.getElementById(id);
 const ui = {
@@ -77,11 +79,7 @@ async function connectBluetooth() {
   }
 
   try {
-    setMessage("正在打开蓝牙设备列表…");
-    bluetoothDevice = await navigator.bluetooth.requestDevice({
-      acceptAllDevices: true,
-      optionalServices: [SERVICE_UUID]
-    });
+    bluetoothDevice = await selectTargetDevice();
     bluetoothDevice.addEventListener("gattserverdisconnected", handleDisconnected);
 
     setMessage(`正在连接 ${bluetoothDevice.name || "蓝牙设备"}…`);
@@ -110,6 +108,37 @@ async function connectBluetooth() {
     setMessage(`连接失败：${error.message}`, true);
     addLog(error.message, "error");
   }
+}
+
+async function selectTargetDevice() {
+  const rememberedId = localStorage.getItem(REMEMBERED_DEVICE_KEY);
+
+  /* 浏览器不允许网页使用MAC地址，改用浏览器分配的设备ID记住已授权模块。 */
+  if (rememberedId && typeof navigator.bluetooth.getDevices === "function") {
+    const permittedDevices = await navigator.bluetooth.getDevices();
+    const rememberedDevice = permittedDevices.find((device) =>
+      device.id === rememberedId && device.name === TARGET_DEVICE_NAME
+    );
+    if (rememberedDevice) {
+      setMessage(`正在重新连接已授权的 ${TARGET_DEVICE_NAME}…`);
+      addLog(`使用已记住设备 ${TARGET_DEVICE_NAME}`);
+      return rememberedDevice;
+    }
+  }
+
+  setMessage(`只搜索 ${TARGET_DEVICE_NAME}…`);
+  const selectedDevice = await navigator.bluetooth.requestDevice({
+    filters: [{ name: TARGET_DEVICE_NAME }],
+    optionalServices: [SERVICE_UUID]
+  });
+
+  /* 某些第三方浏览器可能忽略过滤器，因此连接前再次严格校验名称。 */
+  if (selectedDevice.name !== TARGET_DEVICE_NAME) {
+    throw new Error(`拒绝连接 ${selectedDevice.name || "未命名设备"}，只允许 ${TARGET_DEVICE_NAME}`);
+  }
+
+  localStorage.setItem(REMEMBERED_DEVICE_KEY, selectedDevice.id);
+  return selectedDevice;
 }
 
 function disconnectBluetooth() {
