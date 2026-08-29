@@ -147,7 +147,7 @@ async function readSerialPort(port) {
 
 async function connectSerialPort(port) {
   setMessage("正在连接 JDY-31 串口…");
-  await port.open({ baudRate: 9600, bufferSize: 1024 });
+  await port.open({ baudRate: 57600, bufferSize: 1024 });
   serialPort = port;
   serialWriter = port.writable.getWriter();
   serialReadTask = readSerialPort(port);
