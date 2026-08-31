@@ -224,8 +224,8 @@
       <section class="card parameter-card">
         <div class="parameter-heading"><div><p class="kicker">PID</p><h2>循迹控制</h2></div><small>分母越小，作用越强</small></div>
         <div class="parameter-grid">
-          <label class="parameter-field"><span><strong>P 分母</strong><small>KP_DIV · 1～1000</small></span><input class="param-input" data-param="KP_DIV" type="number" min="1" max="1000" value="130" disabled></label>
-          <label class="parameter-field"><span><strong>D 分母</strong><small>KD_DIV · 1～1000</small></span><input class="param-input" data-param="KD_DIV" type="number" min="1" max="1000" value="120" disabled></label>
+          <label class="parameter-field"><span><strong>P 分母</strong><small>KP_DIV · 代码默认95</small></span><input class="param-input" data-param="KP_DIV" type="number" min="1" max="1000" value="95" disabled></label>
+          <label class="parameter-field"><span><strong>D 分母</strong><small>KD_DIV · 代码默认25</small></span><input class="param-input" data-param="KD_DIV" type="number" min="1" max="1000" value="25" disabled></label>
           <label class="parameter-field"><span><strong>D 最大修正</strong><small>D_MAX · 0～100%</small></span><input class="param-input" data-param="D_MAX" type="number" min="0" max="100" value="15" disabled></label>
           <label class="parameter-field"><span><strong>D 滤波强度</strong><small>D_FILTER · 1不滤波 / 8最平滑</small></span><input class="param-input" data-param="D_FILTER" type="number" min="1" max="8" value="4" disabled></label>
           <label class="parameter-field"><span><strong>控制周期</strong><small>PID_MS · 5～100 ms</small></span><input class="param-input" data-param="PID_MS" type="number" min="5" max="100" value="20" disabled></label>
@@ -235,18 +235,19 @@
       <section class="card parameter-card">
         <div class="parameter-heading"><div><p class="kicker">传感器</p><h2>直线基准</h2></div><small>小车居中静止时的四路值</small></div>
         <div class="parameter-grid">
-          <label class="parameter-field"><span><strong>L1 基准</strong><small>L1_BASE · 0～4095</small></span><input class="param-input" data-param="L1_BASE" type="number" min="0" max="4095" value="250" disabled></label>
-          <label class="parameter-field"><span><strong>L2 基准</strong><small>L2_BASE · 0～4095</small></span><input class="param-input" data-param="L2_BASE" type="number" min="0" max="4095" value="265" disabled></label>
-          <label class="parameter-field"><span><strong>R1 基准</strong><small>R1_BASE · 0～4095</small></span><input class="param-input" data-param="R1_BASE" type="number" min="0" max="4095" value="288" disabled></label>
-          <label class="parameter-field"><span><strong>R2 基准</strong><small>R2_BASE · 0～4095</small></span><input class="param-input" data-param="R2_BASE" type="number" min="0" max="4095" value="300" disabled></label>
+          <label class="parameter-field"><span><strong>L1 基准</strong><small>L1_BASE · 0～4095</small></span><input class="param-input" data-param="L1_BASE" type="number" min="0" max="4095" value="93" disabled></label>
+          <label class="parameter-field"><span><strong>L2 基准</strong><small>L2_BASE · 0～4095</small></span><input class="param-input" data-param="L2_BASE" type="number" min="0" max="4095" value="90" disabled></label>
+          <label class="parameter-field"><span><strong>R1 基准</strong><small>R1_BASE · 0～4095</small></span><input class="param-input" data-param="R1_BASE" type="number" min="0" max="4095" value="200" disabled></label>
+          <label class="parameter-field"><span><strong>R2 基准</strong><small>R2_BASE · 0～4095</small></span><input class="param-input" data-param="R2_BASE" type="number" min="0" max="4095" value="150" disabled></label>
         </div>
       </section>
 
       <section class="card parameter-card">
-        <div class="parameter-heading"><div><p class="kicker">十字路口</p><h2>识别与控制</h2></div><small>左右平衡 + 四路全高</small></div>
+        <div class="parameter-heading"><div><p class="kicker">十字路口</p><h2>识别与控制</h2></div><small>校正峰值 + 有效能量 + 左右平衡</small></div>
         <div class="parameter-grid">
           <label class="parameter-field"><span><strong>检测开关</strong><small>CROSS_EN · 0关 / 1开</small></span><input class="param-input" data-param="CROSS_EN" type="number" min="0" max="1" value="1" disabled></label>
-          <label class="parameter-field"><span><strong>左右侧阈值</strong><small>CROSS_SIDE_MIN · 0～4095</small></span><input class="param-input" data-param="CROSS_SIDE_MIN" type="number" min="0" max="4095" value="350" disabled></label>
+          <label class="parameter-field"><span><strong>校正后峰值门槛</strong><small>CROSS_SIDE_MIN · 已减BASE</small></span><input class="param-input" data-param="CROSS_SIDE_MIN" type="number" min="0" max="4095" value="150" disabled></label>
+          <label class="parameter-field"><span><strong>单侧有效能量门槛</strong><small>CROSS_ENERGY_MIN · 两路校正值之和</small></span><input class="param-input" data-param="CROSS_ENERGY_MIN" type="number" min="0" max="8190" value="250" disabled></label>
           <label class="parameter-field"><span><strong>四路全高阈值</strong><small>CROSS_ALL_MIN · L1/L2/R1/R2</small></span><input class="param-input" data-param="CROSS_ALL_MIN" type="number" min="0" max="4095" value="1200" disabled></label>
           <label class="parameter-field"><span><strong>左右平衡比例</strong><small>CROSS_BALANCE · 弱侧/强侧 10%～100%</small></span><input class="param-input" data-param="CROSS_BALANCE" type="number" min="10" max="100" value="50" disabled></label>
           <label class="parameter-field"><span><strong>十字 P 分母</strong><small>CROSS_KP_DIV · 1～2000</small></span><input class="param-input" data-param="CROSS_KP_DIV" type="number" min="1" max="2000" value="300" disabled></label>
