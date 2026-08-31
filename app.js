@@ -89,12 +89,24 @@ function setDriveState(state) {
   ui.driveState.className = `mode-badge ${selected[1]}`;
 }
 
-function setSpeed(command) {
-  const percent = command === "0" ? 100 : Number(command) * 10;
+function gearPercent(command) {
+  return command === "0" ? 100 : 50 + Number(command) * 5;
+}
+
+function speedCommandFromPercent(percent) {
+  if (percent >= 100) return "0";
+  return String(Math.max(1, Math.min(9, Math.round((percent - 50) / 5))));
+}
+
+function setSpeed(command, percent = gearPercent(command)) {
   ui.speedValue.textContent = `${percent}%`;
   ui.gearGrid.querySelectorAll(".gear").forEach((button) => {
     button.classList.toggle("selected", button.dataset.command === command);
   });
+}
+
+function setSpeedFromPercent(percent) {
+  setSpeed(speedCommandFromPercent(percent), percent);
 }
 
 function addLog(text, kind = "rx") {
@@ -366,7 +378,7 @@ function processLine(line) {
   }
 
   const speed = numberFrom(line, "SPEED");
-  if (speed !== null) setSpeed(speed >= 100 ? "0" : String(Math.round(speed / 10)));
+  if (speed !== null) setSpeedFromPercent(speed);
   if (/PID\s+FORWARD/i.test(line)) setDriveState("F");
   if (/BACKWARD/i.test(line)) setDriveState("B");
   if (/\bSTOP\b/i.test(line)) setDriveState("S");
@@ -449,8 +461,8 @@ async function loadGrantedDevices() {
 
 ui.deviceNameFilter.value = localStorage.getItem(BLE_PREFIX_KEY) ?? "JDY";
 window.SmartCarSensorCharts?.init();
-window.SmartCarTuning?.init({ sendCommand, setMessage, onSpeed: (value) => setSpeed(value >= 100 ? "0" : String(Math.round(value / 10))) });
+window.SmartCarTuning?.init({ sendCommand, setMessage, onSpeed: setSpeedFromPercent });
 setConnected(false);
 loadGrantedDevices();
 setDriveState("S");
-setSpeed("6");
+setSpeed("2");
