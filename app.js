@@ -15,7 +15,8 @@ const ui = {
   speedValue: byId("speedValue"), gearGrid: byId("gearGrid"), streamState: byId("streamState"),
   l1Value: byId("l1Value"), l2Value: byId("l2Value"), r1Value: byId("r1Value"), r2Value: byId("r2Value"),
   l1Bar: byId("l1Bar"), l2Bar: byId("l2Bar"), r1Bar: byId("r1Bar"), r2Bar: byId("r2Bar"),
-  sumValue: byId("sumValue"), errorValue: byId("errorValue"), errorNeedle: byId("errorNeedle"),
+  raceTimerCard: byId("raceTimerCard"), raceTimerValue: byId("raceTimerValue"),
+  raceTimerStatus: byId("raceTimerStatus"), errorValue: byId("errorValue"), errorNeedle: byId("errorNeedle"),
   crossCard: byId("crossCard"), crossValue: byId("crossValue"), crossText: byId("crossText"),
   logWindow: byId("logWindow"), clearLogButton: byId("clearLogButton"),
   packetCount: byId("packetCount"), lastReceive: byId("lastReceive")
@@ -35,8 +36,44 @@ let receiveBuffer = "";
 let packetCount = 0;
 let streamTimer = null;
 let lastTelemetryLog = 0;
+let raceTimerRunning = false;
+let raceTimerStartedAt = 0;
+let raceTimerElapsedMs = 0;
+let raceTimerFrame = 0;
 const encoder = new TextEncoder();
 const decoder = new TextDecoder("utf-8");
+
+function formatRaceTime(elapsedMs) {
+  const totalMs = Math.max(0, Math.floor(elapsedMs));
+  const minutes = Math.floor(totalMs / 60000);
+  const seconds = Math.floor(totalMs % 60000 / 1000);
+  const milliseconds = totalMs % 1000;
+  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}.${String(milliseconds).padStart(3, "0")}`;
+}
+
+function renderRaceTimer() {
+  if (raceTimerRunning) raceTimerElapsedMs = performance.now() - raceTimerStartedAt;
+  ui.raceTimerValue.textContent = formatRaceTime(raceTimerElapsedMs);
+  ui.raceTimerCard.classList.toggle("running", raceTimerRunning);
+  ui.raceTimerStatus.textContent = raceTimerRunning ? "计时中" : raceTimerElapsedMs > 0 ? "已停车" : "等待发车";
+  if (raceTimerRunning) raceTimerFrame = requestAnimationFrame(renderRaceTimer);
+}
+
+function startRaceTimer(reset = true) {
+  if (reset) raceTimerElapsedMs = 0;
+  raceTimerStartedAt = performance.now() - raceTimerElapsedMs;
+  raceTimerRunning = true;
+  cancelAnimationFrame(raceTimerFrame);
+  renderRaceTimer();
+}
+
+function stopRaceTimer() {
+  if (raceTimerRunning) raceTimerElapsedMs = performance.now() - raceTimerStartedAt;
+  raceTimerRunning = false;
+  cancelAnimationFrame(raceTimerFrame);
+  raceTimerFrame = 0;
+  renderRaceTimer();
+}
 
 function setMessage(text, isError = false) {
   ui.message.textContent = text;
@@ -271,7 +308,7 @@ async function connectLastDevice() {
 async function disconnectCurrentDevice() {
   if (!serialPort && !bluetoothDevice?.gatt?.connected) return;
   intentionalDisconnect = true;
-  await sendCommand("S");
+  if (await sendCommand("S")) stopRaceTimer();
   if (activeTransport === "serial") {
     const port = serialPort;
     serialPort = null;
@@ -298,6 +335,7 @@ function handleDisconnected() {
   activeTransport = null;
   receiveBuffer = "";
   clearTimeout(streamTimer);
+  stopRaceTimer();
   setConnected(false);
   ui.deviceName.textContent = lastDeviceLabel();
   ui.streamState.textContent = "等待数据";
@@ -379,9 +417,15 @@ function processLine(line) {
 
   const speed = numberFrom(line, "SPEED");
   if (speed !== null) setSpeedFromPercent(speed);
-  if (/PID\s+FORWARD/i.test(line)) setDriveState("F");
+  if (/PID\s+FORWARD/i.test(line)) {
+    setDriveState("F");
+    if (!raceTimerRunning) startRaceTimer(true);
+  }
   if (/BACKWARD/i.test(line)) setDriveState("B");
-  if (/\bSTOP\b/i.test(line)) setDriveState("S");
+  if (/\bSTOP\b/i.test(line)) {
+    setDriveState("S");
+    stopRaceTimer();
+  }
 }
 
 function updateTelemetry(data) {
@@ -394,7 +438,6 @@ function updateTelemetry(data) {
     barElement.style.width = `${Math.max(0, Math.min(100, value / 4095 * 100))}%`;
   });
 
-  ui.sumValue.textContent = String(data.sum);
   ui.errorValue.textContent = String(data.error);
   const errorPosition = 50 + Math.max(-1, Math.min(1, data.error / 6000)) * 50;
   ui.errorNeedle.style.left = `${errorPosition}%`;
@@ -426,7 +469,12 @@ ui.connectionType.addEventListener("change", () => {
 
 document.querySelectorAll(".drive-button").forEach((button) => {
   button.addEventListener("click", async () => {
-    if (await sendCommand(button.dataset.command)) setDriveState(button.dataset.command);
+    const command = button.dataset.command;
+    if (await sendCommand(command)) {
+      setDriveState(command);
+      if (command === "F") startRaceTimer(true);
+      else if (command === "S") stopRaceTimer();
+    }
   });
 });
 
