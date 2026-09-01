@@ -60,24 +60,6 @@
     <div class="app-module" id="controlModule">
     <section class="card">
       <div class="section-title compact">
-        <h2>车辆控制</h2>
-        <span class="mode-badge stopped" id="driveState">已停车</span>
-      </div>
-      <div class="drive-grid">
-        <button class="drive-button forward control" data-command="F" type="button" disabled>
-          <span class="drive-icon">▶</span><strong>开始循迹</strong><small>发送 F</small>
-        </button>
-        <button class="drive-button stop control" data-command="S" type="button" disabled>
-          <span class="drive-icon">■</span><strong>立即停车</strong><small>发送 S</small>
-        </button>
-        <button class="drive-button reverse control" data-command="B" type="button" disabled>
-          <span class="drive-icon">◀</span><strong>倒车</strong><small>发送 B</small>
-        </button>
-      </div>
-    </section>
-
-    <section class="card">
-      <div class="section-title compact">
         <div>
           <p class="kicker">PWM 档位</p>
           <h2>速度设置</h2>
@@ -95,6 +77,24 @@
         <button class="gear control" data-command="8" disabled><span>8</span><small>90%</small></button>
         <button class="gear control" data-command="9" disabled><span>9</span><small>95%</small></button>
         <button class="gear full control" data-command="0" disabled><span>0</span><small>满速 100%</small></button>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-title compact">
+        <h2>车辆控制</h2>
+        <span class="mode-badge stopped" id="driveState">已停车</span>
+      </div>
+      <div class="drive-grid">
+        <button class="drive-button forward control" data-command="F" type="button" disabled>
+          <span class="drive-icon">▶</span><strong>开始循迹</strong><small>发送 F</small>
+        </button>
+        <button class="drive-button stop control" data-command="S" type="button" disabled>
+          <span class="drive-icon">■</span><strong>立即停车</strong><small>发送 S</small>
+        </button>
+        <button class="drive-button reverse control" data-command="B" type="button" disabled>
+          <span class="drive-icon">◀</span><strong>倒车</strong><small>发送 B</small>
+        </button>
       </div>
     </section>
 
