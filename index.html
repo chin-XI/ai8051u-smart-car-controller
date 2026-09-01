@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#07111f">
+  <meta name="theme-color" content="#6d5ce7">
   <meta name="description" content="AI8051U 智能车 JDY-31 蓝牙控制台">
   <title>AI8051U 智能车控制台</title>
-  <link rel="stylesheet" href="styles.css?v=20260901-racetimer">
-  <link rel="stylesheet" href="tuning.css?v=20260829-runtime">
-  <link rel="stylesheet" href="sensor-charts.css?v=20260830-crossmarkers">
+  <link rel="stylesheet" href="styles.css?v=20260901-amethyst">
+  <link rel="stylesheet" href="tuning.css?v=20260901-amethyst">
+  <link rel="stylesheet" href="sensor-charts.css?v=20260901-amethyst">
 </head>
 <body>
   <main class="shell">
@@ -91,9 +91,6 @@
         </button>
         <button class="drive-button stop control" data-command="S" type="button" disabled>
           <span class="drive-icon">■</span><strong>立即停车</strong><small>发送 S</small>
-        </button>
-        <button class="drive-button reverse control" data-command="B" type="button" disabled>
-          <span class="drive-icon">◀</span><strong>倒车</strong><small>发送 B</small>
         </button>
       </div>
     </section>
@@ -179,10 +176,10 @@
         <div class="waveform-heading">
           <div><p class="kicker">ADC 0–4000</p><h2>四路传感器</h2></div>
           <div class="waveform-legend" aria-label="四路传感器图例">
-            <span style="--series:#42d7ee">L1 <strong id="chartL1Value">--</strong></span>
-            <span style="--series:#258cff">L2 <strong id="chartL2Value">--</strong></span>
-            <span style="--series:#ffbd4a">R1 <strong id="chartR1Value">--</strong></span>
-            <span style="--series:#ff5365">R2 <strong id="chartR2Value">--</strong></span>
+            <span style="--series:#6d5ce7">L1 <strong id="chartL1Value">--</strong></span>
+            <span style="--series:#2d6cdf">L2 <strong id="chartL2Value">--</strong></span>
+            <span style="--series:#d47a08">R1 <strong id="chartR1Value">--</strong></span>
+            <span style="--series:#d93650">R2 <strong id="chartR2Value">--</strong></span>
           </div>
         </div>
         <div class="canvas-wrap"><canvas id="sensorWaveform" aria-label="L1、L2、R1、R2实时波形图"></canvas></div>
@@ -192,8 +189,8 @@
         <div class="waveform-heading">
           <div><p class="kicker">ADC 0–7000</p><h2>左右传感器总和</h2></div>
           <div class="waveform-legend" aria-label="左右总和图例">
-            <span style="--series:#38dc82">左侧 L1+L2 <strong id="chartLeftValue">--</strong></span>
-            <span style="--series:#b57cff">右侧 R1+R2 <strong id="chartRightValue">--</strong></span>
+            <span style="--series:#168a55">左侧 L1+L2 <strong id="chartLeftValue">--</strong></span>
+            <span style="--series:#6d5ce7">右侧 R1+R2 <strong id="chartRightValue">--</strong></span>
           </div>
         </div>
         <div class="canvas-wrap"><canvas id="sideSumWaveform" aria-label="左右传感器总和实时波形图"></canvas></div>
@@ -225,11 +222,11 @@
       <section class="card parameter-card">
         <div class="parameter-heading"><div><p class="kicker">PID</p><h2>循迹控制</h2></div><small>分母越小，作用越强</small></div>
         <div class="parameter-grid">
-          <label class="parameter-field"><span><strong>P 分母</strong><small>KP_DIV · 代码默认95</small></span><input class="param-input" data-param="KP_DIV" type="number" min="1" max="1000" value="95" disabled></label>
-          <label class="parameter-field"><span><strong>D 分母</strong><small>KD_DIV · 代码默认25</small></span><input class="param-input" data-param="KD_DIV" type="number" min="1" max="1000" value="25" disabled></label>
+          <label class="parameter-field"><span><strong>P 分母</strong><small>KP_DIV · 代码默认72</small></span><input class="param-input" data-param="KP_DIV" type="number" min="1" max="1000" value="72" disabled></label>
+          <label class="parameter-field"><span><strong>D 分母</strong><small>KD_DIV · 代码默认9</small></span><input class="param-input" data-param="KD_DIV" type="number" min="1" max="1000" value="9" disabled></label>
           <label class="parameter-field"><span><strong>D 最大修正</strong><small>D_MAX · 0～100%</small></span><input class="param-input" data-param="D_MAX" type="number" min="0" max="100" value="15" disabled></label>
           <label class="parameter-field"><span><strong>D 滤波强度</strong><small>D_FILTER · 1不滤波 / 8最平滑</small></span><input class="param-input" data-param="D_FILTER" type="number" min="1" max="8" value="4" disabled></label>
-          <label class="parameter-field"><span><strong>控制周期</strong><small>PID_MS · 5～100 ms</small></span><input class="param-input" data-param="PID_MS" type="number" min="5" max="100" value="20" disabled></label>
+          <label class="parameter-field"><span><strong>控制周期</strong><small>PID_MS · 5～100 ms</small></span><input class="param-input" data-param="PID_MS" type="number" min="5" max="100" value="10" disabled></label>
         </div>
       </section>
 
@@ -263,7 +260,7 @@
           <label class="parameter-field"><span><strong>当前速度</strong><small>SPEED · 10～100%</small></span><input class="param-input" data-param="SPEED" type="number" min="10" max="100" value="60" disabled></label>
           <label class="parameter-field"><span><strong>电机输出上限</strong><small>MOTOR_MAX · 10～100%</small></span><input class="param-input" data-param="MOTOR_MAX" type="number" min="10" max="100" value="100" disabled></label>
           <label class="parameter-field"><span><strong>数据返回周期</strong><small>REPORT_MS · 20～2000 ms</small></span><input class="param-input" data-param="REPORT_MS" type="number" min="20" max="2000" value="50" disabled></label>
-          <label class="parameter-field read-only"><span><strong>PWM 频率</strong><small>PWM_HZ · 需重新编译修改</small></span><input class="param-input" data-param="PWM_HZ" type="number" value="30000" readonly disabled></label>
+          <label class="parameter-field read-only"><span><strong>PWM 频率</strong><small>PWM_HZ · 需重新编译修改</small></span><input class="param-input" data-param="PWM_HZ" type="number" value="20000" readonly disabled></label>
         </div>
       </section>
     </section>
@@ -286,8 +283,8 @@
     </section>
   </main>
 
-  <script src="sensor-charts.js?v=20260830-crossmarkers"></script>
+  <script src="sensor-charts.js?v=20260901-amethyst"></script>
   <script src="tuning.js?v=20260829-baud57600"></script>
-  <script src="app.js?v=20260901-racetimer"></script>
+  <script src="app.js?v=20260901-amethyst-no-reverse"></script>
 </body>
 </html>
