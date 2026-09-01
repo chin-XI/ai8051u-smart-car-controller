@@ -479,7 +479,7 @@ function updateUltrasonic(distance, obstacle, enabled) {
 
   let stateClass = "safe";
   let stateText = "前方安全";
-  let stateHint = "≤20 cm停车，≥25 cm自动恢复";
+  let stateHint = "≤30 cm停车，≥35 cm自动恢复";
   if (!avoidanceEnabled) {
     stateClass = "off";
     stateText = "避障已关闭";
@@ -487,11 +487,11 @@ function updateUltrasonic(distance, obstacle, enabled) {
   } else if (stoppedByObstacle) {
     stateClass = "stopped";
     stateText = "前方物体，车辆已停车";
-    stateHint = "有效距离恢复到25 cm后自动发车";
-  } else if (distance !== null && distance >= 0 && distance <= 20) {
+    stateHint = "有效距离恢复到35 cm后自动发车";
+  } else if (distance !== null && distance >= 0 && distance <= 30) {
     stateClass = "stopped";
     stateText = "已进入停车距离";
-    stateHint = "固件将在20 cm内立即停止电机";
+    stateHint = "固件将在30 cm内立即停止电机";
   } else if (distance === null || distance < 0) {
     stateClass = "off";
     stateText = "等待有效回波";
