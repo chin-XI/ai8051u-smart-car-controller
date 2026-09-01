@@ -195,6 +195,29 @@
         </div>
         <div class="canvas-wrap"><canvas id="sideSumWaveform" aria-label="左右传感器总和实时波形图"></canvas></div>
       </section>
+
+      <section class="card ultrasonic-card" id="ultrasonicCard">
+        <div class="section-title compact">
+          <div><p class="kicker">P3.2 TRIG · P3.3 ECHO</p><h2>超声波避障</h2></div>
+          <label class="toggle-control">
+            <input id="ultrasonicEnableToggle" type="checkbox" disabled>
+            <span class="toggle-track" aria-hidden="true"><i></i></span>
+            <strong id="ultrasonicToggleText">等待连接</strong>
+          </label>
+        </div>
+        <div class="ultrasonic-grid">
+          <article class="ultrasonic-distance">
+            <span>前方距离</span>
+            <strong id="ultrasonicDistance">--</strong>
+            <small>测距周期约50 ms</small>
+          </article>
+          <article class="ultrasonic-status off" id="ultrasonicStatusCard">
+            <span>避障状态</span>
+            <strong id="ultrasonicStatus">等待数据</strong>
+            <small id="ultrasonicStatusHint">18～10 cm减速，≤10 cm停车</small>
+          </article>
+        </div>
+      </section>
     </section>
 
     <section class="app-module" id="tuningModule" hidden>
@@ -260,6 +283,7 @@
           <label class="parameter-field"><span><strong>当前速度</strong><small>SPEED · 10～100%</small></span><input class="param-input" data-param="SPEED" type="number" min="10" max="100" value="60" disabled></label>
           <label class="parameter-field"><span><strong>电机输出上限</strong><small>MOTOR_MAX · 10～100%</small></span><input class="param-input" data-param="MOTOR_MAX" type="number" min="10" max="100" value="100" disabled></label>
           <label class="parameter-field"><span><strong>数据返回周期</strong><small>REPORT_MS · 20～2000 ms</small></span><input class="param-input" data-param="REPORT_MS" type="number" min="20" max="2000" value="50" disabled></label>
+          <label class="parameter-field"><span><strong>超声波避障</strong><small>ULTRA_EN · 0关 / 1开</small></span><input class="param-input" data-param="ULTRA_EN" type="number" min="0" max="1" value="1" disabled></label>
           <label class="parameter-field read-only"><span><strong>PWM 频率</strong><small>PWM_HZ · 需重新编译修改</small></span><input class="param-input" data-param="PWM_HZ" type="number" value="20000" readonly disabled></label>
         </div>
       </section>
@@ -283,8 +307,8 @@
     </section>
   </main>
 
-  <script src="sensor-charts.js?v=20260901-amethyst"></script>
-  <script src="tuning.js?v=20260829-baud57600"></script>
-  <script src="app.js?v=20260901-amethyst-no-reverse"></script>
+  <script src="sensor-charts.js?v=20260901-ultrasonic"></script>
+  <script src="tuning.js?v=20260901-ultrasonic"></script>
+  <script src="app.js?v=20260901-ultrasonic"></script>
 </body>
 </html>

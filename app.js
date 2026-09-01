@@ -18,6 +18,11 @@ const ui = {
   raceTimerCard: byId("raceTimerCard"), raceTimerValue: byId("raceTimerValue"),
   raceTimerStatus: byId("raceTimerStatus"), errorValue: byId("errorValue"), errorNeedle: byId("errorNeedle"),
   crossCard: byId("crossCard"), crossValue: byId("crossValue"), crossText: byId("crossText"),
+  ultrasonicCard: byId("ultrasonicCard"), ultrasonicDistance: byId("ultrasonicDistance"),
+  ultrasonicStatusCard: byId("ultrasonicStatusCard"), ultrasonicStatus: byId("ultrasonicStatus"),
+  ultrasonicStatusHint: byId("ultrasonicStatusHint"),
+  ultrasonicEnableToggle: byId("ultrasonicEnableToggle"),
+  ultrasonicToggleText: byId("ultrasonicToggleText"),
   logWindow: byId("logWindow"), clearLogButton: byId("clearLogButton"),
   packetCount: byId("packetCount"), lastReceive: byId("lastReceive")
 };
@@ -40,6 +45,7 @@ let raceTimerRunning = false;
 let raceTimerStartedAt = 0;
 let raceTimerElapsedMs = 0;
 let raceTimerFrame = 0;
+let obstacleStopActive = false;
 const encoder = new TextEncoder();
 const decoder = new TextDecoder("utf-8");
 
@@ -87,6 +93,8 @@ function setConnected(connected) {
   ui.connectionType.disabled = connected;
   ui.deviceNameFilter.disabled = connected;
   document.querySelectorAll(".control").forEach((button) => { button.disabled = !connected; });
+  ui.ultrasonicEnableToggle.disabled = !connected;
+  if (!connected) ui.ultrasonicToggleText.textContent = "等待连接";
   updateConnectionControls();
   window.SmartCarTuning?.setConnected(connected);
   window.SmartCarSensorCharts?.setConnected(connected);
@@ -118,6 +126,7 @@ function updateConnectionControls() {
 function setDriveState(state) {
   const states = {
     F: ["循迹中", "tracking"],
+    O: ["障碍停车", "obstacle"],
     S: ["已停车", "stopped"]
   };
   const selected = states[state] || states.S;
@@ -378,7 +387,7 @@ function handleNotification(event) {
 }
 
 function numberFrom(line, key) {
-  const match = line.match(new RegExp(`(?:^|\\s)${key}\\s*=\\s*(-?\\d+)`, "i"));
+  const match = line.match(new RegExp(`(?:^|\\s)${key}\\s*=\\s*(-?\\d+(?:\\.\\d+)?)`, "i"));
   return match ? Number(match[1]) : null;
 }
 
@@ -400,10 +409,13 @@ function processLine(line) {
   const sum = numberFrom(line, "SUM");
   const error = numberFrom(line, "ERROR");
   const cross = numberFrom(line, "CROSS");
+  const distance = numberFrom(line, "DIST");
+  const obstacle = numberFrom(line, "OBS");
+  const ultrasonicEnabled = numberFrom(line, "ULTRA");
   const telemetry = [l1, l2, r1, r2, sum, error, cross].every((value) => value !== null);
 
   if (telemetry) {
-    updateTelemetry({ l1, l2, r1, r2, sum, error, cross });
+    updateTelemetry({ l1, l2, r1, r2, sum, error, cross, distance, obstacle, ultrasonicEnabled });
     window.SmartCarSensorCharts?.push({ l1, l2, r1, r2, cross });
     const now = Date.now();
     if (now - lastTelemetryLog >= 250) {
@@ -445,6 +457,8 @@ function updateTelemetry(data) {
   ui.crossValue.textContent = `CROSS=${detected ? 1 : 0}`;
   ui.crossText.textContent = detected ? "检测到十字路口" : "普通路段";
 
+  updateUltrasonic(data.distance, data.obstacle, data.ultrasonicEnabled);
+
   ui.streamState.textContent = "数据流正常";
   ui.streamState.classList.add("live");
   clearTimeout(streamTimer);
@@ -452,6 +466,48 @@ function updateTelemetry(data) {
     ui.streamState.textContent = "数据暂停";
     ui.streamState.classList.remove("live");
   }, 1500);
+}
+
+function updateUltrasonic(distance, obstacle, enabled) {
+  if (enabled === null) return;
+
+  const avoidanceEnabled = enabled === 1;
+  const stoppedByObstacle = obstacle === 1;
+  ui.ultrasonicEnableToggle.checked = avoidanceEnabled;
+  ui.ultrasonicToggleText.textContent = avoidanceEnabled ? "避障已启用" : "仅显示距离";
+  ui.ultrasonicDistance.textContent = distance === null || distance < 0 ? "无回波" : `${distance.toFixed(1)} cm`;
+
+  let stateClass = "safe";
+  let stateText = "前方安全";
+  let stateHint = "18～10 cm减速，≤10 cm停车";
+  if (!avoidanceEnabled) {
+    stateClass = "off";
+    stateText = "避障已关闭";
+    stateHint = "距离继续显示，但不会控制电机";
+  } else if (stoppedByObstacle) {
+    stateClass = "stopped";
+    stateText = "前方物体，车辆已停车";
+    stateHint = "有效距离恢复到20 cm后自动发车";
+  } else if (distance !== null && distance >= 0 && distance <= 18) {
+    stateClass = "slowing";
+    stateText = distance <= 10 ? "即将停车" : "接近障碍，正在减速";
+    stateHint = "基础速度随距离缩短而降低";
+  } else if (distance === null || distance < 0) {
+    stateClass = "off";
+    stateText = "等待有效回波";
+    stateHint = "请检查模块朝向和Echo接线";
+  }
+
+  ui.ultrasonicStatusCard.className = `ultrasonic-status ${stateClass}`;
+  ui.ultrasonicStatus.textContent = stateText;
+  ui.ultrasonicStatusHint.textContent = stateHint;
+
+  if (stoppedByObstacle) {
+    setDriveState("O");
+  } else if (obstacleStopActive && raceTimerRunning) {
+    setDriveState("F");
+  }
+  obstacleStopActive = stoppedByObstacle;
 }
 
 ui.connectButton.addEventListener("click", connectSelectedDevice);
@@ -484,6 +540,18 @@ ui.gearGrid.querySelectorAll(".gear").forEach((button) => {
 
 ui.clearLogButton.addEventListener("click", () => {
   ui.logWindow.innerHTML = '<p class="muted">日志已清空</p>';
+});
+
+ui.ultrasonicEnableToggle.addEventListener("change", async () => {
+  const requested = ui.ultrasonicEnableToggle.checked;
+  ui.ultrasonicEnableToggle.disabled = true;
+  ui.ultrasonicToggleText.textContent = "正在设置…";
+  const sent = await sendCommand(`@ULTRA ${requested ? 1 : 0}\n`);
+  if (!sent) ui.ultrasonicEnableToggle.checked = !requested;
+  setTimeout(() => {
+    const connected = Boolean(serialPort || bluetoothDevice?.gatt?.connected);
+    ui.ultrasonicEnableToggle.disabled = !connected;
+  }, 350);
 });
 
 async function loadGrantedDevices() {

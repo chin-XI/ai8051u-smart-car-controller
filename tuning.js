@@ -257,6 +257,16 @@ window.SmartCarTuning = (() => {
       ui.message.textContent = `${match[1]} 已应用`;
       return true;
     }
+    match = line.match(/^OK ULTRA_EN=(0|1)$/i);
+    if (match) {
+      const value = Number(match[1]);
+      values.set("ULTRA_EN", value);
+      const input = inputs.get("ULTRA_EN");
+      if (input) input.value = String(value);
+      updateDirtyCount();
+      ui.message.textContent = `超声波避障已${value ? "启用" : "关闭"}`;
+      return true;
+    }
     if (/^OK PARAM DEFAULTS$/i.test(line)) {
       ui.message.textContent = "已恢复代码默认值，正在重新读取…";
       return true;
