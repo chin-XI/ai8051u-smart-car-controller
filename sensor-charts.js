@@ -20,15 +20,15 @@ window.SmartCarSensorCharts = (() => {
   let lastCross = null;
 
   const fourSeries = [
-    { key: "l1", color: "#42d7ee" }, { key: "l2", color: "#258cff" },
-    { key: "r1", color: "#ffbd4a" }, { key: "r2", color: "#ff5365" }
+    { key: "l1", color: "#6d5ce7" }, { key: "l2", color: "#2d6cdf" },
+    { key: "r1", color: "#d47a08" }, { key: "r2", color: "#d93650" }
   ];
   const sideSeries = [
-    { key: "left", color: "#38dc82" }, { key: "right", color: "#b57cff" }
+    { key: "left", color: "#168a55" }, { key: "right", color: "#6d5ce7" }
   ];
   const crossEvents = {
-    enter: { color: "#38dc82", label: "进入" },
-    exit: { color: "#ff5365", label: "退出" }
+    enter: { color: "#168a55", label: "进入" },
+    exit: { color: "#d93650", label: "退出" }
   };
 
   function maxPoints() { return Number(ui.historyLength.value) || 200; }
@@ -87,25 +87,25 @@ window.SmartCarSensorCharts = (() => {
     ctx.textBaseline = "middle";
     for (let step = 0; step <= 4; step += 1) {
       const y = plot.bottom - plotHeight * step / 4;
-      ctx.strokeStyle = step === 0 ? "#35546d" : "rgba(88,128,158,.22)";
+      ctx.strokeStyle = step === 0 ? "#a9afbc" : "rgba(113,105,154,.16)";
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(plot.left, y);
       ctx.lineTo(plot.right, y);
       ctx.stroke();
-      ctx.fillStyle = "#7890a4";
+      ctx.fillStyle = "#687083";
       ctx.fillText(String(Math.round(maximum * step / 4)), plot.left - 7, y);
     }
 
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
-    ctx.fillStyle = "#60788d";
+    ctx.fillStyle = "#7a8190";
     ctx.fillText("较早", plot.left, plot.bottom + 8);
     ctx.textAlign = "right";
     ctx.fillText("当前", plot.right, plot.bottom + 8);
 
     if (samples.length < 2) {
-      ctx.fillStyle = "#6f879b";
+      ctx.fillStyle = "#747b8b";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillText(connected ? "等待传感器数据" : "连接蓝牙后开始绘图", plot.left + plotWidth / 2, plot.top + plotHeight / 2);

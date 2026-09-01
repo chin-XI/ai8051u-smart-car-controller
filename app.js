@@ -118,7 +118,6 @@ function updateConnectionControls() {
 function setDriveState(state) {
   const states = {
     F: ["循迹中", "tracking"],
-    B: ["倒车中", "reversing"],
     S: ["已停车", "stopped"]
   };
   const selected = states[state] || states.S;
@@ -205,7 +204,7 @@ async function connectSerialPort(port) {
   intentionalDisconnect = false;
   ui.deviceName.textContent = "JDY-31 · SPP";
   setConnected(true);
-  setMessage("SPP 串口蓝牙连接成功，可发送 F / B / S / 0～9");
+  setMessage("SPP 串口蓝牙连接成功，可发送 F / S / 0～9");
   addLog("已连接 JDY-31 SPP");
 }
 
@@ -250,7 +249,7 @@ async function connectBleDevice(device) {
   localStorage.setItem(REMEMBERED_BLE_DEVICE_KEY, device.id);
   ui.deviceName.textContent = device.name || "未命名设备";
   setConnected(true);
-  setMessage("BLE 连接成功，可发送 F / B / S / 0～9");
+  setMessage("BLE 连接成功，可发送 F / S / 0～9");
   addLog(`已连接 ${device.name || "未命名 BLE 设备"}`);
 }
 
@@ -421,7 +420,6 @@ function processLine(line) {
     setDriveState("F");
     if (!raceTimerRunning) startRaceTimer(true);
   }
-  if (/BACKWARD/i.test(line)) setDriveState("B");
   if (/\bSTOP\b/i.test(line)) {
     setDriveState("S");
     stopRaceTimer();
