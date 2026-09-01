@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#07111f">
   <meta name="description" content="AI8051U 智能车 JDY-31 蓝牙控制台">
   <title>AI8051U 智能车控制台</title>
-  <link rel="stylesheet" href="styles.css?v=20260829-spp">
+  <link rel="stylesheet" href="styles.css?v=20260901-racetimer">
   <link rel="stylesheet" href="tuning.css?v=20260829-runtime">
   <link rel="stylesheet" href="sensor-charts.css?v=20260830-crossmarkers">
 </head>
@@ -127,9 +127,10 @@
       </div>
 
       <div class="metrics-grid">
-        <article class="metric">
-          <span>四路总和 SUM</span>
-          <strong id="sumValue">--</strong>
+        <article class="metric race-timer" id="raceTimerCard">
+          <span>本次发车计时</span>
+          <strong id="raceTimerValue">00:00.000</strong>
+          <small id="raceTimerStatus">等待发车</small>
         </article>
         <article class="metric error-metric">
           <span>循迹误差 ERROR</span>
@@ -287,6 +288,6 @@
 
   <script src="sensor-charts.js?v=20260830-crossmarkers"></script>
   <script src="tuning.js?v=20260829-baud57600"></script>
-  <script src="app.js?v=20260831-gears55-100"></script>
+  <script src="app.js?v=20260901-racetimer"></script>
 </body>
 </html>
